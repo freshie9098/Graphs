@@ -1,0 +1,84 @@
+//https://www.lintcode.com/problem/434/
+
+class DSU{
+    private:
+    vector<int>parent,size,rank;
+    
+    public:
+    DSU(int n){
+        for(int i = 0; i<n ;++i){
+            parent.push_back(i);
+            size.push_back(1);
+        }
+    }
+    
+    void unionSize(int u,int v){
+        int pu = parent[u];
+        int pv = parent[v];
+        
+        if(pu==pv)return;
+        
+        if(size[pu] < size[pv]){
+            parent[pu] = pv;
+            size[pv]+=size[pu];
+        }
+        else{
+            parent[pv] = pu;
+            size[pu]+=size[pv];
+        }
+    }
+    
+    int findPar(int node){
+        if(parent[node]==node)return node;
+        
+        return parent[node] = findPar(parent[node]);
+    }
+    
+};
+/**
+ * Definition for a point.
+ * struct Point {
+ *     int x;
+ *     int y;
+ *     Point() : x(0), y(0) {}
+ *     Point(int a, int b) : x(a), y(b) {}
+ * };
+ */
+ int X[4] = {1,0,-1,0};
+ int Y[4] = {0,1,0,-1};
+class Solution {
+public:
+    vector<int> numIslands2(int n, int m, vector<Point> &operators) {
+      DSU dsu(n*m);
+      int cnt = 0;
+      vector<int>ans;
+      vector<vector<int>>grid(n,vector<int>(m,0));
+    for(auto it:operators){
+        int i = it.x;
+        int j = it.y;
+        if(grid[i][j]==1){
+            ans.push_back(cnt);continue;
+        }
+        grid[i][j] = 1;
+        int ind1 = i*m+j;
+        cnt++;
+            for(int a = 0;a<4;++a){
+                int x1 = i+X[a];
+                int y1 = j+Y[a];
+                int ind2 = x1*m + y1;
+                if(x1>=0 && y1>=0 && x1<n && y1<m && grid[x1][y1] ==1 ){
+                    int p1 = dsu.findPar(ind1);
+                    int p2 = dsu.findPar(ind2);
+                    if(p1==p2)continue;
+                    cnt--;
+                    dsu.unionSize(ind1,ind2);
+                }
+            }
+            ans.push_back(cnt);
+    }
+
+    return ans;
+
+    }
+};
+
